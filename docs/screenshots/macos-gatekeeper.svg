@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="680" viewBox="0 0 1200 680">
+  <rect width="1200" height="680" fill="#f3f5f8"/>
+  <rect x="40" y="40" width="1120" height="600" rx="16" fill="#ffffff" stroke="#d4dae3"/>
+  <text x="80" y="110" font-size="42" fill="#1f2937" font-family="PingFang SC, Arial">macOS Gatekeeper 打开方式（示意）</text>
+  <text x="80" y="180" font-size="30" fill="#334155" font-family="PingFang SC, Arial">1. Finder 中右键 DuiWei Scrum Board.app / dmg</text>
+  <text x="80" y="235" font-size="30" fill="#334155" font-family="PingFang SC, Arial">2. 选择“打开”</text>
+  <text x="80" y="290" font-size="30" fill="#334155" font-family="PingFang SC, Arial">3. 系统提示时再次点击“打开”</text>
+  <rect x="80" y="340" width="480" height="230" rx="12" fill="#eef2f7" stroke="#c8d0dc"/>
+  <rect x="100" y="382" width="440" height="44" rx="10" fill="#ffffff" stroke="#cfd6e2"/>
+  <text x="120" y="412" font-size="24" fill="#111827" font-family="PingFang SC, Arial">右键菜单：打开（O）</text>
+  <rect x="100" y="444" width="440" height="90" rx="10" fill="#ffffff" stroke="#cfd6e2"/>
+  <text x="120" y="500" font-size="24" fill="#111827" font-family="PingFang SC, Arial">安全性与隐私：仍要打开</text>
+  <rect x="630" y="340" width="450" height="230" rx="12" fill="#1e3a8a" opacity="0.9"/>
+  <text x="670" y="405" font-size="30" fill="#ffffff" font-family="PingFang SC, Arial">首次安装常见</text>
+  <text x="670" y="455" font-size="26" fill="#dbeafe" font-family="PingFang SC, Arial">“无法验证开发者”</text>
+  <text x="670" y="505" font-size="26" fill="#dbeafe" font-family="PingFang SC, Arial">按上述步骤可继续</text>
+</svg>

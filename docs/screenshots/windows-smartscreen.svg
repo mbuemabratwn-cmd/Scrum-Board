@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="680" viewBox="0 0 1200 680">
+  <rect width="1200" height="680" fill="#eef2ff"/>
+  <rect x="40" y="40" width="1120" height="600" rx="16" fill="#ffffff" stroke="#c7d2fe"/>
+  <text x="80" y="110" font-size="42" fill="#0f172a" font-family="Microsoft YaHei, Arial">Windows SmartScreen 安装方式（示意）</text>
+  <text x="80" y="180" font-size="30" fill="#334155" font-family="Microsoft YaHei, Arial">1. 双击安装包 .exe 后，点击“更多信息”</text>
+  <text x="80" y="235" font-size="30" fill="#334155" font-family="Microsoft YaHei, Arial">2. 点击“仍要运行”继续安装</text>
+  <rect x="80" y="300" width="1020" height="280" rx="14" fill="#f8fafc" stroke="#dbe3f0"/>
+  <rect x="110" y="340" width="420" height="52" rx="10" fill="#dbeafe"/>
+  <text x="135" y="374" font-size="25" fill="#1d4ed8" font-family="Microsoft YaHei, Arial">更多信息</text>
+  <rect x="110" y="414" width="420" height="52" rx="10" fill="#c7d2fe"/>
+  <text x="135" y="448" font-size="25" fill="#3730a3" font-family="Microsoft YaHei, Arial">仍要运行</text>
+  <rect x="580" y="334" width="490" height="220" rx="12" fill="#111827"/>
+  <text x="610" y="390" font-size="28" fill="#f9fafb" font-family="Microsoft YaHei, Arial">注意：</text>
+  <text x="610" y="440" font-size="24" fill="#cbd5e1" font-family="Microsoft YaHei, Arial">仅从可信来源下载的安装包执行此操作</text>
+  <text x="610" y="485" font-size="24" fill="#cbd5e1" font-family="Microsoft YaHei, Arial">团队内部发布包可按此流程安装</text>
+</svg>

@@ -1,0 +1,105 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg-page: #f7f2ea;
+  --color-bg-surface: #ffffff;
+  --color-bg-hover-card: #fff7ec;
+  --color-bg-column: #efe6d9;
+  --color-bg-muted: #f3ece2;
+  --color-text-primary: #2f2a24;
+  --color-text-secondary: #63584e;
+  --color-text-tertiary: #9c8f82;
+  --color-border-subtle: #e2d7ca;
+  --color-accent-login: #4a8bb5;
+  --color-accent-board: #1a9e8f;
+  --color-accent-board-hover: #168a7d;
+  --color-accent-board-active: #12766b;
+  --color-accent-board-tint: #e6f5f3;
+  --color-priority-high: #e05a4f;
+  --color-priority-high-tint: #f8d6d1;
+  --color-priority-high-border: rgba(224, 90, 79, 0.45);
+  --color-priority-mid: #e8a735;
+  --color-priority-mid-tint: #f7e3bf;
+  --color-priority-mid-border: rgba(232, 167, 53, 0.45);
+  --color-priority-low: #a8b4c0;
+  --color-priority-low-tint: #dde5ee;
+  --color-priority-low-border: rgba(168, 180, 192, 0.5);
+  --color-status-online: #36b37e;
+  --color-status-offline: #e05a4f;
+  --color-assignee-cao: #e0d4f7;
+  --color-assignee-cao-text: #5b3fa0;
+  --color-assignee-liao: #d4ecf7;
+  --color-assignee-liao-text: #2a6f9c;
+  --color-assignee-deng: #f7e4d4;
+  --color-assignee-deng-text: #9c5a2a;
+  --font-ui: 'Noto Serif SC', 'Songti SC', serif;
+  --font-base: 15px;
+  --fs-2xs: calc(var(--font-base) * 0.72);
+  --fs-xs: calc(var(--font-base) * 0.86);
+  --fs-sm: calc(var(--font-base) * 0.93);
+  --fs-md: var(--font-base);
+  --fs-lg: calc(var(--font-base) * 1.14);
+  --fs-xl: calc(var(--font-base) * 1.34);
+  --fs-column-title: calc(var(--font-base) * 1.16);
+  --fs-card-title: calc(var(--font-base) * 1.42);
+  --fs-card-desc: calc(var(--font-base) * 1.0);
+  --fs-label: calc(var(--font-base) * 0.93);
+  --fs-tag: calc(var(--font-base) * 0.86);
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font-ui);
+  color: var(--color-text-primary);
+  background: var(--color-bg-page);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-size: var(--fs-md);
+}
+
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.board-column .column-scroll {
+  scrollbar-width: none;
+}
+
+.board-column .column-scroll::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.board-column:hover .column-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #b7c0ca transparent;
+}
+
+.board-column:hover .column-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.board-column:hover .column-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background-color: #b7c0ca;
+}
