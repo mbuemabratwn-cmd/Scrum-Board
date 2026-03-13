@@ -12,12 +12,14 @@ import ContextMenu, { type ContextMenuState } from '../components/ContextMenu'
 import CreateTaskModal from '../components/CreateTaskModal'
 import JiraCalendarLite from '../components/JiraCalendarLite'
 import PersonalBoard from '../components/PersonalBoard'
+import PublicWorklogPanel from '../components/PublicWorklogPanel'
 import TaskDetailPanel from '../components/TaskDetailPanel'
 import Toast, { type ToastItem } from '../components/Toast'
 import TopBar from '../components/TopBar'
 import { useConnectionStatus } from '../hooks/useConnectionStatus'
 import { useKeyboard } from '../hooks/useKeyboard'
 import { useTasks } from '../hooks/useTasks'
+import { useWorklogs } from '../hooks/useWorklogs'
 import { MEMBERS } from '../mock/members'
 import { THEME_PRESETS } from '../mock/themePresets'
 import { setupPresence, subscribePresenceByMember } from '../services/presence'
@@ -39,6 +41,7 @@ import {
   type NotificationSettings,
 } from '../services/notification'
 import { SAVE_RETRY_EXHAUSTED, type UpdateTaskInput } from '../services/taskService'
+import { WORKLOG_SAVE_RETRY_EXHAUSTED } from '../services/worklogService'
 import type { Task, TaskAssignee, TaskMember, TaskPriority, TaskStatus } from '../types/task'
 
 interface BoardPageProps {
@@ -62,6 +65,9 @@ function resolveCurrentMember(user: User): TaskMember | null {
 function toErrorMessage(error: unknown, fallback: string) {
   if (error instanceof Error && error.message === SAVE_RETRY_EXHAUSTED) {
     return '保存失败，请检查网络连接'
+  }
+  if (error instanceof Error && error.message === WORKLOG_SAVE_RETRY_EXHAUSTED) {
+    return '记录保存失败，请检查网络连接'
   }
   if (error instanceof Error && error.message) {
     return error.message
@@ -96,7 +102,7 @@ function BoardPage({ currentUser }: BoardPageProps) {
     consumeQueuedOfflineWrites,
   } = useTasks({ isConnected })
 
-  const [viewMode, setViewMode] = useState<'calendar' | 'board' | 'personal'>('board')
+  const [viewMode, setViewMode] = useState<'calendar' | 'board' | 'personal' | 'worklog'>('board')
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [isCreateSaving, setIsCreateSaving] = useState(false)
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
@@ -114,6 +120,12 @@ function BoardPage({ currentUser }: BoardPageProps) {
     liao: false,
     deng: false,
   })
+  const {
+    entries: worklogEntries,
+    loading: worklogLoading,
+    createEntry: createWorklogEntry,
+    deleteEntry: deleteWorklogEntry,
+  } = useWorklogs()
 
   const toastTimersRef = useRef<Record<string, number>>({})
   const previousTasksRef = useRef<Record<string, Task>>({})
@@ -121,7 +133,13 @@ function BoardPage({ currentUser }: BoardPageProps) {
   const displayName = currentUser.displayName || currentUser.email || '未命名成员'
   const isPersonalView = viewMode === 'personal'
   const boardTitle =
-    viewMode === 'personal' ? '个人任务面板' : viewMode === 'calendar' ? '公开任务日历' : '公开任务看板'
+    viewMode === 'personal'
+      ? '个人任务面板'
+      : viewMode === 'calendar'
+        ? '公开任务日历'
+        : viewMode === 'worklog'
+          ? '公共记录面板'
+          : '公开任务看板'
 
   const selectedPalette =
     THEME_PRESETS.find((preset) => preset.id === 12) ?? THEME_PRESETS[0]
@@ -778,6 +796,35 @@ function BoardPage({ currentUser }: BoardPageProps) {
     void signOutCurrentUser()
   }, [])
 
+  const handleCreateWorklog = useCallback(
+    async (payload: { member: TaskMember; content: string }) => {
+      try {
+        await createWorklogEntry({
+          member: payload.member,
+          content: payload.content,
+          createdByUid: currentUser.uid,
+          createdByName: displayName,
+        })
+      } catch (createError) {
+        pushToast('worklog.create', toErrorMessage(createError, '记录保存失败，请稍后重试'))
+        throw createError
+      }
+    },
+    [createWorklogEntry, currentUser.uid, displayName, pushToast],
+  )
+
+  const handleDeleteWorklog = useCallback(
+    async (entryId: string) => {
+      try {
+        await deleteWorklogEntry(entryId)
+      } catch (deleteError) {
+        pushToast('worklog.delete', toErrorMessage(deleteError, '删除记录失败，请稍后重试'))
+        throw deleteError
+      }
+    },
+    [deleteWorklogEntry, pushToast],
+  )
+
   const handleGlobalEscape = useCallback(() => {
     if (contextMenuState) {
       setContextMenuState(null)
@@ -880,6 +927,17 @@ function BoardPage({ currentUser }: BoardPageProps) {
               >
                 个人任务
               </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('worklog')}
+                className={`rounded-[6px] px-3 py-1.5 text-[length:var(--fs-sm)] ${
+                  viewMode === 'worklog'
+                    ? 'bg-[var(--color-accent-board-tint)] font-medium text-[var(--color-accent-board-active)]'
+                    : 'text-[var(--color-text-secondary)]'
+                }`}
+              >
+                公共记录
+              </button>
             </div>
 
             <div className="min-h-0 flex-1">
@@ -895,6 +953,14 @@ function BoardPage({ currentUser }: BoardPageProps) {
                   onTaskContextMenu={handleTaskContextMenu}
                   onTakeTask={handleTakeTask}
                   onMarkDone={handleMarkDone}
+                />
+              ) : viewMode === 'worklog' ? (
+                <PublicWorklogPanel
+                  entries={worklogEntries}
+                  loading={worklogLoading}
+                  currentMember={currentMember}
+                  onCreate={handleCreateWorklog}
+                  onDelete={handleDeleteWorklog}
                 />
               ) : (
                 <Board
