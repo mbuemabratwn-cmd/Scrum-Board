@@ -10,6 +10,7 @@ import type { User } from 'firebase/auth'
 import Board from '../components/Board'
 import ContextMenu, { type ContextMenuState } from '../components/ContextMenu'
 import CreateTaskModal from '../components/CreateTaskModal'
+import JiraCalendarLite from '../components/JiraCalendarLite'
 import PersonalBoard from '../components/PersonalBoard'
 import TaskDetailPanel from '../components/TaskDetailPanel'
 import Toast, { type ToastItem } from '../components/Toast'
@@ -95,7 +96,7 @@ function BoardPage({ currentUser }: BoardPageProps) {
     consumeQueuedOfflineWrites,
   } = useTasks({ isConnected })
 
-  const [isPersonalView, setIsPersonalView] = useState(false)
+  const [viewMode, setViewMode] = useState<'calendar' | 'board' | 'personal'>('board')
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [isCreateSaving, setIsCreateSaving] = useState(false)
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
@@ -118,6 +119,9 @@ function BoardPage({ currentUser }: BoardPageProps) {
   const previousTasksRef = useRef<Record<string, Task>>({})
   const currentMember = useMemo(() => resolveCurrentMember(currentUser), [currentUser])
   const displayName = currentUser.displayName || currentUser.email || '未命名成员'
+  const isPersonalView = viewMode === 'personal'
+  const boardTitle =
+    viewMode === 'personal' ? '个人任务面板' : viewMode === 'calendar' ? '公开任务日历' : '公开任务看板'
 
   const selectedPalette =
     THEME_PRESETS.find((preset) => preset.id === 12) ?? THEME_PRESETS[0]
@@ -260,7 +264,7 @@ function BoardPage({ currentUser }: BoardPageProps) {
 
   useEffect(() => {
     const unsubscribe = subscribeNotificationTaskClick((taskId) => {
-      setIsPersonalView(false)
+      setViewMode('board')
       setSelectedTaskId(taskId)
       window.focus()
     })
@@ -797,7 +801,7 @@ function BoardPage({ currentUser }: BoardPageProps) {
     <main style={themeStyle} className="flex h-screen flex-col bg-[var(--color-bg-page)]">
       <TopBar
         userName={displayName}
-        boardTitle={isPersonalView ? '个人任务面板' : '公开任务看板'}
+        boardTitle={boardTitle}
         syncText={statusText}
         syncConnected={isConnected}
         currentMember={currentMember}
@@ -808,9 +812,6 @@ function BoardPage({ currentUser }: BoardPageProps) {
         isPersonalView={isPersonalView}
         notificationSettings={notificationSettings}
         showPermissionDeniedHint={showPermissionDeniedHint}
-        onAvatarClick={() => {
-          setIsPersonalView((prev) => !prev)
-        }}
         onToggleNotificationSetting={handleToggleNotificationSetting}
         onClosePermissionDeniedHint={handleClosePermissionDeniedHint}
         onCreateTask={handleCreateTask}
@@ -843,28 +844,72 @@ function BoardPage({ currentUser }: BoardPageProps) {
           <section className="flex h-full items-center justify-center rounded-[10px] border border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)]">
             <p className="text-[length:var(--fs-lg)] text-[var(--color-text-secondary)]">正在同步任务数据...</p>
           </section>
-        ) : isPersonalView ? (
-          <PersonalBoard
-            currentMember={currentMember}
-            todoTasks={personalTasks.todo}
-            doingTasks={personalTasks.doing}
-            doneTasks={personalTasks.done}
-            onTaskOpen={setSelectedTaskId}
-            onTaskContextMenu={handleTaskContextMenu}
-            onTakeTask={handleTakeTask}
-            onMarkDone={handleMarkDone}
-          />
         ) : (
-          <Board
-            pendingTasks={tasksByLane.pending}
-            memberDone={tasksByLane.memberDone}
-            memberHistory={tasksByLane.memberHistory}
-            currentMember={currentMember}
-            onTaskOpen={setSelectedTaskId}
-            onTaskContextMenu={handleTaskContextMenu}
-            onTakeTask={handleTakeTask}
-            onMarkDone={handleMarkDone}
-          />
+          <div className="flex h-full min-h-0 flex-col">
+            <div className="mb-2 inline-flex w-fit items-center gap-1 rounded-[8px] border border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] p-1">
+              <button
+                type="button"
+                onClick={() => setViewMode('calendar')}
+                className={`rounded-[6px] px-3 py-1.5 text-[length:var(--fs-sm)] ${
+                  viewMode === 'calendar'
+                    ? 'bg-[var(--color-accent-board-tint)] font-medium text-[var(--color-accent-board-active)]'
+                    : 'text-[var(--color-text-secondary)]'
+                }`}
+              >
+                日历
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('board')}
+                className={`rounded-[6px] px-3 py-1.5 text-[length:var(--fs-sm)] ${
+                  viewMode === 'board'
+                    ? 'bg-[var(--color-accent-board-tint)] font-medium text-[var(--color-accent-board-active)]'
+                    : 'text-[var(--color-text-secondary)]'
+                }`}
+              >
+                三人看板
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('personal')}
+                className={`rounded-[6px] px-3 py-1.5 text-[length:var(--fs-sm)] ${
+                  viewMode === 'personal'
+                    ? 'bg-[var(--color-accent-board-tint)] font-medium text-[var(--color-accent-board-active)]'
+                    : 'text-[var(--color-text-secondary)]'
+                }`}
+              >
+                个人任务
+              </button>
+            </div>
+
+            <div className="min-h-0 flex-1">
+              {viewMode === 'calendar' ? (
+                <JiraCalendarLite tasks={tasks} onTaskOpen={setSelectedTaskId} />
+              ) : viewMode === 'personal' ? (
+                <PersonalBoard
+                  currentMember={currentMember}
+                  todoTasks={personalTasks.todo}
+                  doingTasks={personalTasks.doing}
+                  doneTasks={personalTasks.done}
+                  onTaskOpen={setSelectedTaskId}
+                  onTaskContextMenu={handleTaskContextMenu}
+                  onTakeTask={handleTakeTask}
+                  onMarkDone={handleMarkDone}
+                />
+              ) : (
+                <Board
+                  pendingTasks={tasksByLane.pending}
+                  memberDone={tasksByLane.memberDone}
+                  memberHistory={tasksByLane.memberHistory}
+                  currentMember={currentMember}
+                  onTaskOpen={setSelectedTaskId}
+                  onTaskContextMenu={handleTaskContextMenu}
+                  onTakeTask={handleTakeTask}
+                  onMarkDone={handleMarkDone}
+                />
+              )}
+            </div>
+          </div>
         )}
       </div>
 

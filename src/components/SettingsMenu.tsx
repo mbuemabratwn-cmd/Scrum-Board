@@ -2,10 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import type { NotificationSettings } from '../services/notification'
 
 interface SettingsMenuProps {
-  isPersonalView: boolean
   notificationSettings: NotificationSettings
   onToggleNotificationSetting: (key: keyof NotificationSettings) => void
-  onToggleView: () => void
   onSignOut: () => void
 }
 
@@ -17,10 +15,8 @@ const SETTING_LABELS: Array<{ key: keyof NotificationSettings; label: string }> 
 ]
 
 function SettingsMenu({
-  isPersonalView,
   notificationSettings,
   onToggleNotificationSetting,
-  onToggleView,
   onSignOut,
 }: SettingsMenuProps) {
   const [open, setOpen] = useState(false)
@@ -64,18 +60,7 @@ function SettingsMenu({
 
       {open ? (
         <div className="absolute left-0 top-[calc(100%+8px)] z-50 w-[240px] rounded-[8px] border border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] p-2 shadow-[0_8px_24px_rgba(20,20,25,0.14)]">
-          <button
-            type="button"
-            onClick={() => {
-              onToggleView()
-              setOpen(false)
-            }}
-            className="mb-2 w-full rounded-[6px] px-2 py-1.5 text-left text-[length:var(--fs-sm)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover-card)]"
-          >
-            {isPersonalView ? '切回公开看板' : '查看个人任务页'}
-          </button>
-
-          <div className="mb-2 border-t border-[var(--color-border-subtle)] pt-2">
+          <div className="mb-2">
             <p className="px-2 text-[length:var(--fs-xs)] text-[var(--color-text-tertiary)]">通知设置</p>
             <div className="mt-1 space-y-1">
               {SETTING_LABELS.map((item) => {
@@ -117,4 +102,3 @@ function SettingsMenu({
 }
 
 export default SettingsMenu
-

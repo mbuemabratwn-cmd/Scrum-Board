@@ -16,7 +16,6 @@ interface TopBarProps {
   isPersonalView: boolean
   notificationSettings: NotificationSettings
   showPermissionDeniedHint: boolean
-  onAvatarClick: () => void
   onToggleNotificationSetting: (key: keyof NotificationSettings) => void
   onClosePermissionDeniedHint: () => void
   onCreateTask: () => void
@@ -36,7 +35,6 @@ function TopBar({
   isPersonalView,
   notificationSettings,
   showPermissionDeniedHint,
-  onAvatarClick,
   onToggleNotificationSetting,
   onClosePermissionDeniedHint,
   onCreateTask,
@@ -46,14 +44,12 @@ function TopBar({
     <header className="border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] px-5 py-2">
       <div className="flex min-h-[64px] items-center justify-between gap-4">
         <div className="flex min-w-[260px] items-center gap-3">
-          <button
-            type="button"
-            onClick={onAvatarClick}
-            className="inline-flex h-9 w-9 items-center justify-center rounded bg-[var(--color-accent-board-tint)] text-sm font-semibold text-[var(--color-accent-board-active)] transition hover:brightness-[0.98]"
-            title={isPersonalView ? '切回公开看板' : '进入个人任务页'}
+          <span
+            className="inline-flex h-9 w-9 items-center justify-center rounded bg-[var(--color-accent-board-tint)] text-sm font-semibold text-[var(--color-accent-board-active)]"
+            title="当前用户"
           >
             {userName.slice(0, 1)}
-          </button>
+          </span>
           <div className="leading-snug">
             <p className="text-[length:var(--fs-lg)] font-semibold text-[var(--color-text-primary)]">
               {boardTitle}
@@ -63,10 +59,8 @@ function TopBar({
             </p>
           </div>
           <SettingsMenu
-            isPersonalView={isPersonalView}
             notificationSettings={notificationSettings}
             onToggleNotificationSetting={onToggleNotificationSetting}
-            onToggleView={onAvatarClick}
             onSignOut={onSignOut}
           />
         </div>
