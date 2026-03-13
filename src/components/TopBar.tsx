@@ -1,5 +1,5 @@
 import { MEMBERS } from '../mock/members'
-import SettingsMenu from './SettingsMenu'
+import SettingsMenu, { type FontPreset } from './SettingsMenu'
 import type { NotificationSettings } from '../services/notification'
 import type { TaskMember } from '../types/task'
 
@@ -15,8 +15,10 @@ interface TopBarProps {
   weekDoneCount: number
   isPersonalView: boolean
   notificationSettings: NotificationSettings
+  currentFontPreset: FontPreset
   showPermissionDeniedHint: boolean
   onToggleNotificationSetting: (key: keyof NotificationSettings) => void
+  onChangeFontPreset: (preset: FontPreset) => void
   onClosePermissionDeniedHint: () => void
   onCreateTask: () => void
   onSignOut: () => void
@@ -34,8 +36,10 @@ function TopBar({
   weekDoneCount,
   isPersonalView,
   notificationSettings,
+  currentFontPreset,
   showPermissionDeniedHint,
   onToggleNotificationSetting,
+  onChangeFontPreset,
   onClosePermissionDeniedHint,
   onCreateTask,
   onSignOut,
@@ -61,6 +65,8 @@ function TopBar({
           <SettingsMenu
             notificationSettings={notificationSettings}
             onToggleNotificationSetting={onToggleNotificationSetting}
+            currentFontPreset={currentFontPreset}
+            onChangeFontPreset={onChangeFontPreset}
             onSignOut={onSignOut}
           />
         </div>

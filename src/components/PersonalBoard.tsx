@@ -28,7 +28,7 @@ function PersonalBoard({
         <div className="text-center">
           <p className="text-[length:var(--fs-xl)] text-[var(--color-text-secondary)]">未识别成员身份</p>
           <p className="mt-1 text-[length:var(--fs-sm)] text-[var(--color-text-tertiary)]">
-            请在昵称中包含“曹 / 廖 / 邓”后重新登录
+            当前账号未绑定成员 UID，请联系管理员补充绑定后重新登录
           </p>
         </div>
       </section>

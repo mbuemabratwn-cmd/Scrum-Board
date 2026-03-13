@@ -13,9 +13,11 @@ import CreateTaskModal from '../components/CreateTaskModal'
 import JiraCalendarLite from '../components/JiraCalendarLite'
 import PersonalBoard from '../components/PersonalBoard'
 import PublicWorklogPanel from '../components/PublicWorklogPanel'
+import type { FontPreset } from '../components/SettingsMenu'
 import TaskDetailPanel from '../components/TaskDetailPanel'
 import Toast, { type ToastItem } from '../components/Toast'
 import TopBar from '../components/TopBar'
+import { resolveMemberByUid } from '../config/memberBindings'
 import { useConnectionStatus } from '../hooks/useConnectionStatus'
 import { useKeyboard } from '../hooks/useKeyboard'
 import { useTasks } from '../hooks/useTasks'
@@ -48,18 +50,22 @@ interface BoardPageProps {
   currentUser: User
 }
 
-const MEMBER_MATCHERS: Array<{ member: TaskMember; keywords: string[] }> = [
-  { member: 'cao', keywords: ['曹', 'cao'] },
-  { member: 'liao', keywords: ['廖', 'liao'] },
-  { member: 'deng', keywords: ['邓', 'deng'] },
-]
+const FONT_PRESET_KEY = 'scrum-board.font-preset.v1'
+const FONT_PRESET_MAP: Record<FontPreset, string> = {
+  noto_serif_sc: "'Noto Serif SC', 'Songti SC', serif",
+  zcool_kuaile: "'ZCOOL KuaiLe', 'Noto Serif SC', 'Songti SC', serif",
+}
 
-function resolveCurrentMember(user: User): TaskMember | null {
-  const source = `${user.displayName ?? ''} ${user.email ?? ''}`.toLowerCase()
-  const matched = MEMBER_MATCHERS.find((item) =>
-    item.keywords.some((keyword) => source.includes(keyword.toLowerCase())),
-  )
-  return matched?.member ?? null
+function loadFontPreset(): FontPreset {
+  try {
+    const raw = window.localStorage.getItem(FONT_PRESET_KEY)
+    if (raw === 'zcool_kuaile' || raw === 'noto_serif_sc') {
+      return raw
+    }
+  } catch {
+    // 忽略 localStorage 异常
+  }
+  return 'noto_serif_sc'
 }
 
 function toErrorMessage(error: unknown, fallback: string) {
@@ -112,6 +118,7 @@ function BoardPage({ currentUser }: BoardPageProps) {
   const [notificationSettings, setNotificationSettings] = useState<NotificationSettings>(() =>
     loadNotificationSettings(),
   )
+  const [fontPreset, setFontPreset] = useState<FontPreset>(() => loadFontPreset())
   const [showPermissionDeniedHint, setShowPermissionDeniedHint] = useState(() =>
     shouldShowPermissionDeniedHint(),
   )
@@ -129,7 +136,7 @@ function BoardPage({ currentUser }: BoardPageProps) {
 
   const toastTimersRef = useRef<Record<string, number>>({})
   const previousTasksRef = useRef<Record<string, Task>>({})
-  const currentMember = useMemo(() => resolveCurrentMember(currentUser), [currentUser])
+  const currentMember = useMemo(() => resolveMemberByUid(currentUser.uid), [currentUser.uid])
   const displayName = currentUser.displayName || currentUser.email || '未命名成员'
   const isPersonalView = viewMode === 'personal'
   const boardTitle =
@@ -215,6 +222,13 @@ function BoardPage({ currentUser }: BoardPageProps) {
   }, [])
 
   useEffect(() => {
+    if (currentMember) {
+      return
+    }
+    pushToast('member.unbound', '当前账号未绑定成员身份，请联系管理员配置 UID 绑定')
+  }, [currentMember, pushToast])
+
+  useEffect(() => {
     return () => {
       Object.values(toastTimersRef.current).forEach((timer) => window.clearTimeout(timer))
       toastTimersRef.current = {}
@@ -224,6 +238,16 @@ function BoardPage({ currentUser }: BoardPageProps) {
   useEffect(() => {
     saveNotificationSettings(notificationSettings)
   }, [notificationSettings])
+
+  useEffect(() => {
+    const fontValue = FONT_PRESET_MAP[fontPreset]
+    document.documentElement.style.setProperty('--font-ui', fontValue)
+    try {
+      window.localStorage.setItem(FONT_PRESET_KEY, fontPreset)
+    } catch {
+      // 忽略 localStorage 异常
+    }
+  }, [fontPreset])
 
   useEffect(() => {
     if (typeof window.Notification === 'undefined') {
@@ -516,7 +540,7 @@ function BoardPage({ currentUser }: BoardPageProps) {
         return
       }
       if (!currentMember) {
-        pushToast('task.take.member', '未识别到你的成员身份，请用曹/廖/邓昵称登录')
+        pushToast('task.take.member', '当前账号未绑定成员身份，请联系管理员配置 UID 绑定')
         return
       }
       if (task.status === 'completed') {
@@ -858,8 +882,10 @@ function BoardPage({ currentUser }: BoardPageProps) {
         weekDoneCount={stats.weekDoneCount}
         isPersonalView={isPersonalView}
         notificationSettings={notificationSettings}
+        currentFontPreset={fontPreset}
         showPermissionDeniedHint={showPermissionDeniedHint}
         onToggleNotificationSetting={handleToggleNotificationSetting}
+        onChangeFontPreset={setFontPreset}
         onClosePermissionDeniedHint={handleClosePermissionDeniedHint}
         onCreateTask={handleCreateTask}
         onSignOut={handleSignOut}

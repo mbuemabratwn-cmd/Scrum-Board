@@ -1,9 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import type { NotificationSettings } from '../services/notification'
 
+export type FontPreset = 'noto_serif_sc' | 'zcool_kuaile'
+
 interface SettingsMenuProps {
   notificationSettings: NotificationSettings
   onToggleNotificationSetting: (key: keyof NotificationSettings) => void
+  currentFontPreset: FontPreset
+  onChangeFontPreset: (preset: FontPreset) => void
   onSignOut: () => void
 }
 
@@ -14,9 +18,16 @@ const SETTING_LABELS: Array<{ key: keyof NotificationSettings; label: string }> 
   { key: 'dueSoon', label: '截止日期提醒' },
 ]
 
+const FONT_LABELS: Array<{ key: FontPreset; label: string }> = [
+  { key: 'noto_serif_sc', label: 'Noto Serif SC' },
+  { key: 'zcool_kuaile', label: 'ZCOOL KuaiLe' },
+]
+
 function SettingsMenu({
   notificationSettings,
   onToggleNotificationSetting,
+  currentFontPreset,
+  onChangeFontPreset,
   onSignOut,
 }: SettingsMenuProps) {
   const [open, setOpen] = useState(false)
@@ -82,6 +93,29 @@ function SettingsMenu({
                   </label>
                 )
               })}
+            </div>
+          </div>
+
+          <div className="mb-2 border-t border-[var(--color-border-subtle)] pt-2">
+            <p className="px-2 text-[length:var(--fs-xs)] text-[var(--color-text-tertiary)]">字体设置</p>
+            <div className="mt-1 space-y-1">
+              {FONT_LABELS.map((item) => (
+                <label
+                  key={item.key}
+                  className="flex cursor-pointer items-center justify-between rounded-[6px] px-2 py-1.5 hover:bg-[var(--color-bg-hover-card)]"
+                >
+                  <span className="text-[length:var(--fs-sm)] text-[var(--color-text-secondary)]">
+                    {item.label}
+                  </span>
+                  <input
+                    type="radio"
+                    name="font-preset"
+                    checked={currentFontPreset === item.key}
+                    onChange={() => onChangeFontPreset(item.key)}
+                    className="h-4 w-4 accent-[var(--color-accent-board)]"
+                  />
+                </label>
+              ))}
             </div>
           </div>
 
